@@ -1,0 +1,22 @@
+# This is a basic workflow to help you get started with Actions.
+# By default is set to run on push to main branch.
+# Workflow is disabled by default by setting branches-ignore to ignore the main branch.
+# You can enable it by replacing the "branches-ignore" line with "branches".
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      - "main"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run tests
+        run: pnpm test
+      - name: Run linter
+        run: pnpm lint
