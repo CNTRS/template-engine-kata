@@ -20,19 +20,19 @@ describe("template engine", () => {
         const result = parse(template, variables)
         expect(result.text).toBe("This is a template with one value and another anotherValue.")
     })
-    it.skip("parses template with no matching variables", () => {
+    it("parses template with no matching variables", () => {
         const template = "This is a template with no matching variables."
         const variables = { variable: "value" }
         const result = parse(template, variables)
         expect(result.text).toBe("This is a template with no matching variables.")
     })
-    it.skip("parses template with empty string", () => {
+    it("parses template with empty string", () => {
         const template = ""
         const variables = {}
         const result = parse(template, variables)
         expect(result.text).toBe("")
     })
-    it.skip("parses template with variable as empty string", () => {
+    it("parses template with variable as empty string", () => {
         const template = "This is a template with a variable: ${variable}"
         const variables = { variable: "" }
         const result = parse(template, variables)
