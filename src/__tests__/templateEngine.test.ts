@@ -45,12 +45,12 @@ describe("template engine", () => {
         expect(result.text).toBe("This is a template with a variable: null")
         expect(result.warnings[0]).toBe("Variable variable is null")
     })
-    it("warns about variable value not found", () => {
+    it("warns about variable value not found in dictionary", () => {
         const template = "This is a template with a variable: ${user}"
         const variables = {}
         const result = parse(template, variables)
         expect(result.text).toBe(template)
-        expect(result.warnings[0]).toBe("Variable user not found")
+        expect(result.warnings[0]).toBe("Variable user not found in dictionary")
     })
     it("warns about variable not found in template", () => {
         const template = "This is a template with a variable: ${variable}"
