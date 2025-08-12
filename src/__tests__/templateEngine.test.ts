@@ -8,13 +8,13 @@ describe("template engine", () => {
         const result = parse(template, variables)
         expect(result.text).toBe(template)
     })
-    it.skip("parses template with one variable", () => {
+    it("parses template with one variable", () => {
         const template = "This is a template with one ${variable}"
         const variables = { variable: "value" }
         const result = parse(template, variables)
         expect(result.text).toBe("This is a template with one value")
     })
-    it.skip("parses template with multiple variables", () => {
+    it("parses template with multiple variables", () => {
         const template = "This is a template with one ${variable} and another ${anotherVariable}."
         const variables = { variable: "value", anotherVariable: "anotherValue" }
         const result = parse(template, variables)
