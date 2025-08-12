@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest"
 import { parse } from "../core/templateEngine"
 
 describe("template engine", () => {
-    it.skip("parses template without variables", () => {
+    it("parses template without variables", () => {
         const template = "This is a template without variables."
         const variables = {}
         const result = parse(template, variables)
