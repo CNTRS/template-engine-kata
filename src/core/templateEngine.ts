@@ -3,6 +3,8 @@ type ParseResponse = {
     warnings: string[]
 }
 
+const templateVariableRegex = /\$\{([^\}]+)\}/g
+
 function recoverVariableValueFromDictionary(variables: Record<string, any>, variableKey: string): string {
     if (variables[variableKey] === null) return "null"
     return variables[variableKey] ?? ""
@@ -14,6 +16,35 @@ function extractVariableKeyFromTemplateVariable(templateVariable: string): strin
 
 function generateTemplateVariableFromVariableKey(variableKey: string): string {
     return `\$\{${variableKey}\}`
+}
+
+function generateVariablesWarnings(template: string, variables: Record<string, any>) {
+    const warnings: string[] = []
+    const variableKeys = Object.keys(variables)
+
+    variableKeys
+        .filter(variableKey => variables[variableKey] === null)
+        .forEach(variableKey => {
+            warnings.push(`Variable ${variableKey} is null`)
+        })
+
+    variableKeys
+        .filter(variableKey => !template.includes(generateTemplateVariableFromVariableKey(variableKey)))
+        .forEach(variableKey => {
+            warnings.push(`Variable ${variableKey} not found in template`)
+        })
+
+    return warnings
+}
+
+function generateParserWarnings(parsedText: string) {
+    const warnings: string[] = [];
+    (parsedText.match(templateVariableRegex) ?? [])
+        .forEach((variable: string) => {
+            warnings.push(`Variable ${extractVariableKeyFromTemplateVariable(variable)} not found in dictionary`)
+        })
+
+    return warnings
 }
 
 function parseWithInvalidTemplateOrVariables(template: string, variables: Record<string, any>) {
@@ -43,32 +74,15 @@ export function parse(template: string, variables: Record<string, any>): ParseRe
         return parseWithInvalidTemplateOrVariables(template, variables)
     }
 
-    const templateVariableRegex = /\$\{([^\}]+)\}/g
-    const variablesInTemplate: string[] = template.match(templateVariableRegex) ?? []
-    const variablesInDictionary: string[] = []
-
     if (variables && Object.keys(variables).length > 0) {
         Object.keys(variables).forEach(variableKey => {
-            variablesInDictionary.push(generateTemplateVariableFromVariableKey(variableKey))
             const variableValue = recoverVariableValueFromDictionary(variables, variableKey)
-
-            if (variables[variableKey] === null) {
-                warnings.push(`Variable ${variableKey} is null`)
-            }
-            parsedText = parsedText.replaceAll(variablesInDictionary.at(-1) as string, variableValue)
+            parsedText = parsedText.replaceAll(generateTemplateVariableFromVariableKey(variableKey), variableValue)
         })
     }
 
-    variablesInDictionary
-        .filter(variable => !variablesInTemplate.includes(variable))
-        .forEach(variable => {
-            warnings.push(`Variable ${extractVariableKeyFromTemplateVariable(variable)} not found in template`)
-        });
-
-    (parsedText.match(templateVariableRegex) ?? [])
-        .forEach((variable: string) => {
-            warnings.push(`Variable ${extractVariableKeyFromTemplateVariable(variable)} not found in dictionary`)
-        })
+    warnings.push(...generateVariablesWarnings(template, variables))
+    warnings.push(...generateParserWarnings(parsedText))
 
     return {
         text: parsedText,
